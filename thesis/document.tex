@@ -169,7 +169,8 @@
 \section{正则表达式}
 \subsection{重要的概念回顾}
 	在给出形式化的定义之前，这里有必要叙述一些重要的结论。这些结论在Sipser\cite{Sips05a}中进行了系统的论述，这里仅简要叙述和正则表达式相关的必要的部分。
-	正则表达式是和有限自动机相等价的计算模型，那么，首先，我们从有限自动机的形式化定义开始。
+	正则表达式是和有限自动机相等价的计算模型，我们可以从有限自动机的定义出发定义有限自动机识别的语言，然后在此基础上定义这些语言对应的操作，最后基于这些操作递归地定义正则表达式。
+	那么，首先，我们从有限自动机的形式化定义开始。
 	\begin{definition}[有限自动机]
 		一个有限自动机是一个五元组\(\left( Q,\Sigma,\delta,q_0,F\right) \),其中\\
 		\indent \indent1. \(Q\) 是一个有限集被称作状态集。\\
@@ -195,7 +196,8 @@
 		令 \(A\) 和 \(B\) 是两个正则语言， 我们定义并、连结和克莱因星号操作如下：\\
 		\indent \indent 1.并： \(A \cup B = \left\lbrace x|x \in A \mbox{或} x \in B \right\rbrace \)\\
 		\indent \indent 2.连结: \(A \circ B = \left\lbrace xy| x \in A \mbox{且} y\in B \right\rbrace\)\\
-		\indent \indent 3.克莱因星号 \(A^* = \left\lbrace x_1 x_2 ...x_k | k \ge 0 \mbox{并且所有的} x_i \in  A \right\rbrace\)
+		\indent \indent 3.克莱因星号 \(A^* = \left\lbrace x_1 x_2 ...x_k | k \ge 0 \mbox{并且所有的} x_i \in  A \right\rbrace\)\\
+		\indent \indent 在优先级上，克莱因星号是最高级的，连结其次，并的优先级是最低的
 	\end{definition}
 	我们可以证明，所有的正则操作都是在正则语言里封闭的，也就是说，所有的正则语言经过正则操作以后都可以被有限自动机所识别，具体的证明内容放在了第六章。
 	
@@ -208,12 +210,48 @@
 		\indent \indent 3. $\emptyset$\\
 		\indent \indent 4. \(\left(  R_1 \cup R_2 \right) ,\mbox{其中}R_1\mbox{和}R_2 \mbox{都是正则表达式}  \)\\
 		\indent \indent 5. \( \left( R_1 \circ R_2 \right),\mbox{其中}R_1\mbox{和}R_2\mbox{都是正则表达式}\)\\
-		\indent \indent 6.\(\left( R_1^* \right) , \mbox{其中R}_1\mbox{是一个正则表达式}\)
+		\indent \indent 6.\(\left( R_1^* \right) , \mbox{其中R}_1\mbox{是一个正则表达式}\)\\
+		\indent 
 	\end{definition}
-	我们也可以证明这个正则表达式的定义和有限自动机是等价的，具体的证明内容参考第六章。
+	其中，表达式\(\epsilon\)代表语言的是一个空字符串，\(emptyset\)代表的是空集，即其中不包含任何字符串。\\
+	\indent 我们也可以证明这个正则表达式的定义和有限自动机是等价的，具体的证明内容参考第六章。
 	
-\subsection{上下文无关文法定义正则表达式}
-	基于定义3.5，我们可以使用上下文无关文法递归地定义正则表达式。但是在此之前，我们需要修改一下正则表达式约定的符号。由于计算机命令行程序难以处理\(\left(\right)\)，并且没有\(\cup\)符号，我们约定：\(\mbox{"}\left(\mbox{"和"}\right)\mbox{"}\)修改为\(\mbox{"}\left[  \mbox{"和"}\right]\mbox{"}\), "\(\cup\)"修改为"\(+\)"。
+\subsection{用上下文无关文法描述正则表达式}
+	基于定义3.5，我们可以使用上下文无关文法递归地描述正则表达式。但是在此之前，我们需要修改一下正则表达式约定的符号。由于计算机命令行程序难以处理"\(\left(\right)\)"，并且没有"\(\cup\)"符号和\(\circ\)，我们约定：\(\mbox{"}\left(\mbox{"和"}\right)\mbox{"}\)修改为\(\mbox{"}\left[  \mbox{"和"}\right]\mbox{"}\)。并且，我们用"\(+\)"代表"并"操作，即"\(\cup\)"，用"\(r_1 r_2\)"，也就是两个正则表达式直接连写来代表连结操作。
+	
+	现在，我们可以把定义3.5改写成如下的形式
+	\begin{equation}
+		r::= \quad \emptyset \quad| \quad\epsilon\quad |\quad a \quad  |\quad r_1 r_2\quad |\quad r_1 + r_2\quad | \quad r^*
+	\end{equation}
+	
+	我们首先从优先级最低的并操作开始，我们约定，上下文无关文法的起始符是rexp,那么，我们可以得到：
+	\begin{equation}
+		rexp \quad::=\quad rterm\quad  | \quad rterm + rexp
+	\end{equation}
+	\indent 起始符的推导有两种情况，如果有并操作的话，这种情况可以分解为两个子表达式，另外一种情况是直接推导出下一个子表达式。对于在并操作下的情况，为了避免在后面的递归下降分析出现左递归的情况， 我们规定 "$+$"符号左边是新的非终结符。如果后续的表达式中还会出现"$+$"操作符，那继续展开右边的 $rexp$ 即可。\\
+	\indent 对于优先级居中，而且也是双目操作的连结操作，我们可以像连结操作一样处理。这是因为：根据递归定义，我们可以把优先级更高、暂时不需要展开的正则表达式视作一个整体。在这种情况下，有更高等级的双目操作符可以抽象为同一个情况。在这种情况下，我们有：
+	\begin{equation}
+		rterm\quad::=\quad rfac\quad | \quad rfac\quad rterm
+	\end{equation}
+	\indent 对于优先级最高，而且是单目操作符的克莱因星号，用上下文无关文法描述是比较容易的：
+	\begin{equation}
+		rfac\quad::=\quad ratom \quad | \quad ratom^* 
+	\end{equation}
+	\indent 根据递归定义，最低级的非终结$ratom$对应两种情况，第一种情况是直接推导出非终结符，第二种情况是推导出括号下的作为一个整体的正则表达式。
+	\begin{equation}
+		ratom\quad::=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad]
+	\end{equation}
+	\indent 其中$@$对应的是空集， $!$ 对应的是空串， $a$对应的是字母表中任意一个字母， $\quad[\quad rexp \quad]$对应的是可能存在是括号内作为一个整体的正则表达式。 \\
+	\indent 综上所述，我们得到了正则表达式的上下文无关文法的定义：
+	\begin{equation}
+		\begin{split}
+			rexp \quad::&=\quad rterm\quad  | \quad rterm + rexp \hfill  \\
+			rterm\quad::&=\quad rfac\quad | \quad rfac\quad rterm \hfill  \\
+			rfac\quad::&=\quad ratom \quad | \quad ratom^* \hfill \\
+			ratom\quad::&=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad] \hfill 
+		\end{split}
+	\end{equation}
+	
 	
 
 	
