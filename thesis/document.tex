@@ -14,6 +14,15 @@
 \usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{pgf}
+\usepackage{amsthm,amssymb}
+%theorem
+\theoremstyle{definition}
+\newtheorem{definition}{\hspace{2em}定义}[chapter]
+\newtheorem{theorem}{\hspace{2em}定理}[chapter]
+\newtheorem{lemma}{\hspace{2em}引理}[chapter]
+\newtheorem{Proof}{证明}[chapter]
+\setlength{\parindent}{2em}
+%theorem完成
 \bibliographystyle{gbt7714-2005}
 %\usepackage{cite}
 
@@ -77,20 +86,32 @@
 \defaultfont                        % 正文使用默认字体，小四，宋体
 
 \chapter{绪论}
-	正则表达式让我们拥有一种简单、具体而表达力强的语言来描述字符串中的各种模式。正则表达式因此可以被用作log 分析、 自然语言处理、 各种程序设计语言中的字符串匹配等需要处理字符串中结构化的数据的地方。正则表达式处理的高效性也允许我们去处理大规模的数据结合。标准的正则表达式匹配算法运行时间是 \(O\left( mn \right) \)
-\section{研究背景及意义}
-  	正则表达式
-研究背景及意义，可用cite去引用。\cite{dean2008mapreduce}
 
-\lipsum
+	
+	
+\section{研究背景和意义}
+	正则表达式让我们拥有一种简单、具体而表达力强的语言来描述字符串中的各种模式。正则表达式因此可以被用于，诸如各种程序设计语言中的字符串匹配等，需要处理字符串中结构化的数据的地方。正则表达式处理的高效性也允许我们去处理大规模的数据集合。标准的正则表达式匹配算法运行时间是 \(O\left( mn \right) \) \cite{Sedg92a} , 其中 \(n\) 是被匹配的字符串的长度，而\(m\)是 模式的长度。
+	
+	
+	为了让计算机程序处理正则表达式，首先，我们需要把输入的正则表达式处理成为计算机可以进一步进行处理的形式。实际上，我们可以将正则表达式看作一个简单的、表达能力有限的程序设计语言。这样的话，我们就可以使用编译原理的技术去实现我们的目标。首先，我们可以使用上下文无关文法对正则表达式进行严格的定义， 然后利用词法分析程序和语法分析程序对输入的正则表达式进行词法分析和语法分析，并生成一个抽象语法树。在本文中，作者使用的是递归下降语法制导分析。 生成抽象语法树以后，我们可以使用抽象语法树去和给定的字符串进行匹配，并给出判定结果：输入的字符串是否符合给定的正则表达式所描述的结构。
+	
+  	实现一个正则表达式解析器有两种技术路线选择：一种选择是使用命令式编程范式来实现，这种范式是大多数主流语言，例如C、Java 等所支持的；另外一种选择是使用函数式编程范式来实现，编程语言 Standard ML、 OCaml、 Haskell等 支持这种范式。其中，相对于命令式的程序设计范式，函数式编程中的模式匹配特性有利于我们编写更简洁的语法分析和词法分析程序，高阶函数抽象能够帮助我们把程序组织的更加符合直观的思路，方便我们对程序进行正确性的证明。
+  	
+  	本文选择了Standard ML/New Jerseys 编译平台实现。（以下简称为 SML/NJ） 本文选择 Sntandard ML 语言主要基于的理由：首先， Standard ML 的语法和语义是用形式化是采用形式化的方法严格给出的，而SML/NJ编译器也经过了严格的形式化的验证，所以，程序语言和平台的可靠性有数学证明作为保障。 其次，SML/NJ是一个轻量级的编译器，使用起来也非常方便。
+
+
 
 \section{研究现状及挑战}
-
-研究现状及挑战。
+	
 
 \section{研究内容与论文结构}
-
-研究内容与论文结构。
+	本文论述了一个基于Standard ML 程序设计语言的正则表达式引擎的设计与实现。并对其中的关键算法给出了数学的推导和
+	正确性的证明。\\
+	\indent 第二章将会对正则表达式给出严格的形式化定义。并且对Standard ML语言进行简单的介绍。\\ 
+	\indent 第三章将会介绍生成正则表达式抽象语法树的内容，包括词法分析和递归下降语法分析。\\
+	\indent 第四章将会介绍字符串和抽象语法树匹配的算法和实现。\\
+	\indent 第五章将会对算法的正确性进行证明。\\
+	\indent 第六章将会进行展望和总结。\\
 
 \chapter{插入算法的示例}
 
@@ -141,9 +162,64 @@
     \end{algorithmic}
 \end{breakablealgorithm}
 
-\chapter{一级标题}
+\chapter{基本概念}
+\section{本章内容概述}
+	本章分为两节，第一节对正则表达式给出上下文无关文法的定义，第二节简要地介绍Standard ML语言的基本语法和在本文中比较常用的一些特性
 
-一级标题
+\section{正则表达式}
+\subsection{重要的概念回顾}
+	在给出形式化的定义之前，这里有必要叙述一些重要的结论。这些结论在Sipser\cite{Sips05a}中进行了系统的论述，这里仅简要叙述和正则表达式相关的必要的部分。
+	正则表达式是和有限自动机相等价的计算模型，那么，首先，我们从有限自动机的形式化定义开始。
+	\begin{definition}[有限自动机]
+		一个有限自动机是一个五元组\(\left( Q,\Sigma,\delta,q_0,F\right) \),其中\\
+		\indent \indent1. \(Q\) 是一个有限集被称作状态集。\\
+		\indent \indent2. \(\Sigma\) 是一个有限集被称作字母表。\\
+		\indent \indent3. \(\delta : Q \times \Sigma \rightarrow Q\) 是转移函数。\\
+		\indent \indent4. \(q_0 \in Q\) 是初始状态集。\\
+		\indent \indent 5. \(F \subseteq Q\) 是接受状态集。
+	\end{definition}
+	在给出有限自动机的定义以后，我们继续对有限自动机识别字符串给出一个严格的定义。从直观上讲，只要输入的字符串一步一步地按照状态图规定的状态运行，最终到达接受状态，我们就可以说有限自动机接受了这个输入的字符串。
+	\begin{definition}[有限自动机接受语言]
+		令 \(M = \left( Q,\Sigma,\delta,q_0,F\right)\) 是一个有限自动机， 令 \( w = w_1 w_2 ... w_n\) 是一个字符串，其中每一个 \(w_i\)都在字母表\(\Sigma\)。 则我们称 \(M\)接受\(w\)当且仅当一个状态序列满足下列条件：\\
+		\indent \indent 1. \(r_0 = q_0\)\\
+		\indent \indent 2. 对所有的\(i = 0... n -1\)都有\(\delta \left( r_i, w_{i+1}\right) = r_{i+1}\)\\
+		\indent \indent 3. \(r_n \in F\)
+	\end{definition}
+	我们称有限自动机\(M\)识别一个语言\(A\) 当且仅当 \(A = \left\lbrace w | M \mbox{接受} w\right\rbrace \)。\\
+	\begin{definition}[正则语言]
+		我们称一个语言为正则语言当且仅当存在有限自动机识别这个语言。
+	\end{definition}
+	
+	就像在算术中，我们可以对阿拉伯数字定义 \(+\) \(\times\) 这样的操作，组成 \( 2 \times \left( 3 +2\right) \)这样的算术表达式。在正则语言中，我们也可以对正则语言定义一些操作，我们可以称之为正则操作。
+	\begin{definition}
+		令 \(A\) 和 \(B\) 是两个正则语言， 我们定义并、连结和克莱因星号操作如下：\\
+		\indent \indent 1.并： \(A \cup B = \left\lbrace x|x \in A \mbox{或} x \in B \right\rbrace \)\\
+		\indent \indent 2.连结: \(A \circ B = \left\lbrace xy| x \in A \mbox{且} y\in B \right\rbrace\)\\
+		\indent \indent 3.克莱因星号 \(A^* = \left\lbrace x_1 x_2 ...x_k | k \ge 0 \mbox{并且所有的} x_i \in  A \right\rbrace\)
+	\end{definition}
+	我们可以证明，所有的正则操作都是在正则语言里封闭的，也就是说，所有的正则语言经过正则操作以后都可以被有限自动机所识别，具体的证明内容放在了第六章。
+	
+	继续刚才算术中的例子，正如我们可以用算术操作符组合出算术表达式，我们也可以将正则语言用正则操作组合出正则表达式。
+	我们不妨递归地进行定义。
+	\begin{definition}
+		我们称 \(R\) 是一个正则表达式， 如果\(R\)是 \\
+		\indent \indent 1. \(a\) 对字母表\(\Sigma\) 中的任意字母 a\\
+		\indent \indent 2. \(\epsilon\)\\
+		\indent \indent 3. $\emptyset$\\
+		\indent \indent 4. \(\left(  R_1 \cup R_2 \right) ,\mbox{其中}R_1\mbox{和}R_2 \mbox{都是正则表达式}  \)\\
+		\indent \indent 5. \( \left( R_1 \circ R_2 \right),\mbox{其中}R_1\mbox{和}R_2\mbox{都是正则表达式}\)\\
+		\indent \indent 6.\(\left( R_1^* \right) , \mbox{其中R}_1\mbox{是一个正则表达式}\)
+	\end{definition}
+	我们也可以证明这个正则表达式的定义和有限自动机是等价的，具体的证明内容参考第六章。
+	
+\subsection{上下文无关文法定义正则表达式}
+	基于定义3.5，我们可以使用上下文无关文法递归地定义正则表达式。但是在此之前，我们需要修改一下正则表达式约定的符号。由于计算机命令行程序难以处理\(\left(\right)\)，并且没有\(\cup\)符号，我们约定：\(\mbox{"}\left(\mbox{"和"}\right)\mbox{"}\)修改为\(\mbox{"}\left[  \mbox{"和"}\right]\mbox{"}\), "\(\cup\)"修改为"\(+\)"。
+	
+
+	
+	
+	
+	
 
 \section{二级标题}
 
