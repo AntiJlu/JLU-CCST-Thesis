@@ -10,7 +10,23 @@
 \usepackage{lipsum}
 \usepackage{graphicx}
 \usepackage{tabularx}
+%代码块
 \usepackage{listings}
+\setcounter{secnumdepth}{4}
+\lstset{
+	columns=fixed,       
+	numbers=left,                                        % 在左侧显示行号
+	numberstyle=\tiny\color{gray},                       % 设定行号格式
+	frame=none,                                          % 不显示背景边框
+	backgroundcolor=\color[RGB]{245,245,244},            % 设定背景颜色
+	keywordstyle=\color[RGB]{40,40,255},                 % 设定关键字颜色
+	numberstyle=\footnotesize\color{darkgray},           
+	commentstyle=\it\color[RGB]{0,96,96},                % 设置代码注释的格式
+	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},   % 设置字符串格式
+	showstringspaces=false,                              % 不显示字符串中的空格
+	language=ml,                                        % 设置语言
+}
+%代码块结束
 \usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{pgf}
@@ -105,11 +121,12 @@
 \section{研究内容与论文结构}
 
 	\indent 第一章主要介绍课题的研究背景、研究现状和论文的整体内容和结构\\
-	\indent 第二章主要用递归定义的方法定义正则表达式，并借助未经验证过的递归下降正则表达式解析器程序原型来介绍Standard ML程序设计语言。\\
-	\indent 第三章将会简要介绍HOL4定理证明，并用形式化的方法给出Fischer[ICFP2010]中算法的实现\\
-	\indent 第四章将会介绍测试结果。\\
-	\indent 第五章将会进行展望和总结。\\
-	\indent 第六章为附录，主要补全对本文展开思路没有影响的证明。
+	\indent 第二章是论文中的基本概念，主要用递归定义的方法定义正则表达式，编译原理中词法分析、语法分析和抽象语法树的概念简介，Standard ML程序设计语言简介，以及HOL4定理证明器进行形式化验证的基础。\\
+	\indent 第三章将会从一个简单的递归下降语法分析程序开始，给出一个Standard ML正则库的简单实现，然后介绍Fischer论文中的算法\cite{fischer2010play}\\
+	\indent 第四章利用形式化的开发方法实现Fischer论文中的算法\\
+	\indent 第五章将会介绍基于形式化验证开发的正则库的测试结果。\\
+	\indent 第六章将会进行展望和总结。\\
+	\indent 第七章为附录，主要补全对本文展开思路没有影响的证明。
 
 \chapter{插入算法的示例}
 
@@ -160,13 +177,13 @@
     \end{algorithmic}
 \end{breakablealgorithm}
 
-\chapter{基本的数学建模}
+\chapter{基本概念和技术简介}
 \section{本章内容概述}
-	本章分为两节，第一节介绍正则表达式的定义。第二节利用一个正则表达式递归下降语法分析器的原型来介绍Standard ML程序设计语言。
+	本章主要介绍论文中一些重要的基本概念。本章分为四节，第一节介绍正则表达式的定义。第二节介绍编译原理的部分基本概念。第三节介绍Standard ML程序设计语言。第四节为HOL4定理证明器简介。
 
 \section{正则表达式}
 \subsection{正则表达式的递归定义}
-	本节主要参考Sipser\cite{Sips05a}计算理论导引中的内容，正则表达式作为和有限自动机相等价的模型，我们不妨从更直观的有限自动机出发来对正则表达式进行定义。考虑篇幅和不影响思路的原因，本节略去了部分部分证明，完整的证明放在第七章附录里。
+	本节主要参考Sipser\cite{Sips05a}计算理论导引中的内容，正则表达式作为和有限自动机相等价的模型，我们不妨从更直观的有限自动机出发来对正则表达式进行定义。考虑篇幅和不影响思路的原因，本节略去了证明，完整的证明放在第七章附录里。
 	\begin{definition}[有限自动机]
 		一个有限自动机是一个五元组\(\left( Q,\Sigma,\delta,q_0,F\right) \),其中\\
 		\indent \indent1. \(Q\) 是一个有限集被称作状态集。\\
@@ -259,18 +276,103 @@
 	
 	
 
-	
-	
+\section{词法分析和语法分析简介}
+	这一节中主要对编译原理从词法分析到抽象语法树生成的过程和部分重要概念作简要的介绍。
+\section{词法分析简介}
+	词法分析
 \section{Standard ML 语言简介}
-	在这一节中，我们主要参考的是Standard ML语言规约文档\cite{harper1986standard}。这是在1997年基于小步语义所指定出来的，后来standard ML程序设计语言所有的实现都是基于这个规约文档。 
+	Standard ML语言最早是为了爱丁堡大学的可计算函数逻辑定理证明器而设计出来的。后来逐渐用于编译器设计、交互式验证等领域。而在这一节中，我们主要参考的是Standard ML语言规约文档\cite{harper1986standard}。是由卡耐基梅隆大学的Robert Harper等学者基于小步语义所制定出来的，这个文档严格地刻画了Standard ML语言的行为，后来Standard ML程序设计语言所有的编译器和运行环境的实现都是基于这个规约文档。 
 
 
 \subsection{Standard ML 语言的实现和运行环境}
-	Standard ML语言有两种运行模式，一种是由编译器直接编译产生可执行代码，另外一种运行模式是函数式程序设计语言所特有的“读入-计算-输出”循环(英语："Reading-Evaluating-Print" Loop)，也被称作为交互式顶层构件(英语："Interactive Toplevel")，是一个比较简单的，和程序的解释器、编译器进行交互的运行环境\cite{abelson1996structure}。
+	Standard ML语言有两种运行模式，一种是由编译器直接编译产生可执行代码，另外一种运行模式是函数式程序设计语言所特有的“读入-计算-输出”循环(英语："Reading-Evaluating-Print" Loop)，也被称作为交互式顶层构件(英语："Interactive Toplevel")，是一个比较简单的，和程序的解释器、编译器进行交互的运行环境\cite{abelson1996structure}。\\
+	\indent Standard ML语言的实现有很多种，其中本论文主要涉及两个实现：第一个是SML/New Jersey，由美国的普林斯顿大学开发维护，被广泛应用于程序设计的课堂教学，以REPL环境为主，在本章中的所有代码都基于这个编译器；第二个则是Poly/ML编译器，这个编译器用于实现两个大型定理证明器项目———由慕尼黑工业大学和剑桥大学支持开发的Isabelle/HOL和剑桥大学和查尔姆斯理工学院支持的HOL4，这个编译器既支持REPL环境又可以编译出一个可执行文件，下一章的内容都是基于这个编译器运行的。
+\subsection{Standard ML语言中的类型}
+	Standard ML是静态强类型语言，也就是说每一个变量都必须有对应的类型，否则程序不可能通过编译器的类型检查，这就要求我们无论是在声明变量还是在编写函数的时候都要注意变量和参数的类型。下面为我们可以看几个在REPL环境中的例子。例如：
+	\begin{lstlisting}
+		val pi = 3.14;
+		> val pi = 3.14 : real
+	\end{lstlisting}
+	这就说明变量\(pi\)的类型是\(real\)。
+	和其他的程序设计语言类似，Standard ML 语言也有诸如字符\(char\)、字符串、（、布尔值("bool")等类型。这些类型之间也可以相互转换。例如：
+	\begin{lstlisting}
+		val what = true;
+		> val what = true : bool
+		(*调用类型转换函数*)
+		Bool.toString(true)
+		> val it = "true" : string
+		(*it 是返回值的引用*)
+	\end{lstlisting}
+	刚才的程序片段中出现了将\(bool\)类型转化为\(string\)类型的函数，实际上， Standard ML中的函数可以看作从从类型到类型的映射，比如刚才的\(toString\)函数，就可以当作\(bool\)到\(string\)的一个映射，在Standard ML语言中表示为:
+	\begin{lstlisting}
+		> val toString : bool -> string
+	\end{lstlisting}
+	除了程序语言规范中给出的类型以外，我们还可以在Standard ML语言中自行定义数据类型。\cite{paulson1996ml-124}这里不妨以本文的研究对象正则表达式作为一个例子，根据上文对正则表达式的定义，我们可以定义一个正则表达式的数据类型\(Regex\)
+	\begin{lstlisting}
+		datatype regexp = None
+		| Empty
+		| Char of char
+		| AnyChar
+		| Or of regexp * regexp
+		| Concat of regexp * regexp
+		| Star of regexp;
+	\end{lstlisting}
+	上面这个声明了八个对象，数据类型\(regexp\)，和这个数据类型的七个构造子\(Empty\)、\(Char\)、\(AnyChar\)、\(Or\)、\(Concat\)和\(Star\)，以及每个构造子所对应的类型。例如，\(Or\)构造子必须由两个\(regex\)类型的元素作为参数去构造。每一个数据类型的变量包含且仅包含其构造子所构造的值。
+\subsection{Standard ML 语言函数式特性概览}
+	函数式程序设计中以数据的变换取代了状态，因而在函数式编程中程序没有数组、循环和赋值语句。相应的，作为支持函数式编程的语言，Standard ML有一系列的特性来解决问题。\\
+	\subsubsection{元组}
+	\indent 元组(\(tuple\)) 是Standard ML中最简单的数据结构，例如
+	\begin{lstlisting}
+		(*两个int类型变量组成的元组*)
+		val pair : int * int = (2,3)
+	\end{lstlisting}
+	其中，元组的类型可以不同，元组中还可以嵌套元组。\\
+	\indent Standard ML只能支持函数返回一个参数，但是基于元组，我们可以让函数返回多个参数。
+	\subsubsection{表}
+	\indent 表(\(list\))。数据集可以组织成为下面的表这样的形式来处理。
+	\begin{lstlisting}
+		[a,b,c,d,e]
+	\end{lstlisting}
+	表支持顺序访问，从左到右地进行扫描。和Lisp系语言一样， Standard ML也可以对表进行处理。在本文中，对\(list\)最重要的操作符是::操作符：
+	\begin{lstlisting}
+		val (op ::) : typ * typ list -> typ list		
+	\end{lstlisting}
+	其中， \(op\)的意思是这是一个函数。::操作符的意义是，给定一个表\(it\)，\(h::t\)会把这个表分为两个部分，表头第一个元素$h$和剩下的部分$t$。	
+	\indent 函数(\(function\)), Standard ML中的表达式主要由函数调用构成的。函数的参数可以是任何类型，包括函数本身。这部分特性在介绍CPS和高阶函数时会进行更详细的说明。Standard ML语言的垃圾收集功能\cite{paulson1996ml-5}支持了这个特性。\\
+	\subsubsection{模式匹配}
+	\indent 模式匹配(\(pattern\) \(matching\))，这是Standard ML语言中非常重要的一个特性，这个特性一般用于多个分支的时候，跳转到不同的分支情况，这个特性可以代替命令式程序语言中的\(case\)语句。模式匹配在Standard ML中有两种形式。\\
+	\indent 第一种形式被称作定义函数表达式，一般的形式如下：
+	\begin{lstlisting}
+		fun pat_1 => exp_1
+			|...
+			|pat_n => pat_n
+	\end{lstlisting}
+	其中每一个\(pat_i\)是一个模式而每一个\(exp_i\)是一个表达式。其中的每一个元素 \( pat => exp\)，被称作为一个定义，或者是一条规则。所有的规则组合起来被称作一个匹配。\\
+	\indent 匹配对模式和表达式的类型都有严格的要求，模式要求每一个规则的模式都是相同的类型\(typ_1\)而每一个表达式的类型也是相同的\(typ_2\)。这样才能建立起来映射\(typ_1 \rightarrow typ_2\)。
 	
-
-三级标题
-
+	这里我们可以给模式匹配举一个简单的例子：
+	\begin{lstlisting}
+		(*字符串元素计数*)
+		fun length []= 0
+			| length (x::xs) =1 + length xs
+	\end{lstlisting}
+	
+	此外，模式匹配还有另外一种格式，如果对一个表达式\(exp\)的各种情况进行匹配，那么也考虑下面这种形式：
+	\begin{lstlisting}
+		case exp
+		of pat1 => exp1
+		| ...
+		| patn => expn
+		(*是下面这种情况的简写*)
+		(fn pat1 => exp1
+		| ...
+		| patn => expn)
+		exp.er
+	\end{lstlisting}
+	程序会首先计算\(exp\)的值，然后在\(case\)\(of\)语句下的各种情况进行匹配。
+	\subsubsection{高阶函数}
+	高阶函数($Higher$ $Order$ $Function$)。
+	
 %最后设置格式，插入参考文献。
 \defaultfont
 \bibliographystyle{gbt7714-2005}
