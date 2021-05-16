@@ -14,17 +14,21 @@
 \usepackage{listings}
 \setcounter{secnumdepth}{4}
 \lstset{
-	columns=fixed,       
-	numbers=left,                                        % 在左侧显示行号
-	numberstyle=\tiny\color{gray},                       % 设定行号格式
-	frame=none,                                          % 不显示背景边框
-	backgroundcolor=\color[RGB]{245,245,244},            % 设定背景颜色
-	keywordstyle=\color[RGB]{40,40,255},                 % 设定关键字颜色
-	numberstyle=\footnotesize\color{darkgray},           
-	commentstyle=\it\color[RGB]{0,96,96},                % 设置代码注释的格式
-	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},   % 设置字符串格式
-	showstringspaces=false,                              % 不显示字符串中的空格
-	language=ml,                                        % 设置语言
+	language = ml,
+	backgroundcolor = \color{yellow!10},    % 背景色：淡黄
+	basicstyle = \small\ttfamily,           % 基本样式 + 小号字体
+	rulesepcolor= \color{gray},             % 代码块边框颜色
+	breaklines = true,                  % 代码过长则换行
+	numbers = left,                     % 行号在左侧显示
+	numberstyle = \small,               % 行号字体
+	keywordstyle = \color{black},            % 关键字颜色
+	commentstyle =\color{blue!100},        % 注释颜色
+	stringstyle = \color{red!100},          % 字符串颜色
+	frame = shadowbox,                  % 用（带影子效果）方框框住代码块
+	showspaces = false,                 % 不显示空格
+	columns = fixed,                    % 字间距固定
+	%escapeinside={<@}{@>}              % 特殊自定分隔符：<@可以自己加颜色@>
+	morekeywords = {as},                % 自加新的关键字（必须前后都是空格）      % 删除内定关键字；删除错误标记的关键字用deletekeywords删！
 }
 %代码块结束
 \usepackage{algorithmic}
@@ -108,79 +112,33 @@
 	
 	
 \section{课题的研究背景和现状}
-	正则表达式最早由Stephen C.Kleene 在他1956年的论文中提出\cite{Kleen72}，在这篇论文中他试图通过正则表达式来刻画神经网络和有限自动机的行为。Ken. Thompson在1968年的论文\cite{Thopson68}中首先对正则表达式的匹配进行了描述。Aho的著作\cite{Aho72a}中对正则表达式和有限自动机的理论进行的综合的叙述。
+	正则表达式最早由Stephen C.Kleene 在他1956年的论文中提出\cite{Kleen72}，在这篇论文中他试图通过正则表达式来刻画神经网络和有限自动机的行为。Ken. Thompson在1968年的论文\cite{thompson1968programming}中首先对正则表达式的匹配进行了描述。Aho的著作\cite{Aho72a}中对正则表达式和有限自动机的理论进行的综合的叙述。
 	正则表达式不但在计算机的基础理论研究中有重要的地位，在实际应用中也有广泛的应用。正则表达式为我们提供了简单、有力而效率高的工具，允许我们用比较短的程序去刻画字符串中复杂的字符串结构。Sedgewick\cite{Sedg92a}中指出，经典正则表达式匹配算法的时间复杂度为\(O\left( mn\right) \),其中\(n\)是字符串的长度而\(m\)是正则表达式模式的长度。
 	对于正则表达式而言，我们可以将其看作一个比较简单的程序设计语言，那么我们就可以使用编译原理中所学习的知识去处理正则表达式。我们需要考虑对正则表达式进行词法分析、语法分析然后生成抽象语法树，最后将抽象语法树转化为有限自动机，再和给定的字符串进行匹配。这些经典的步骤的设计与实现在\cite{appel2004modern}中有详细的叙述。\\
 	\indent 随着计算机科学的发展以及对文本处理需求的提高，正则表达式本身处理能力也不断地提高。除了经典正则表达式中的并、连结、克莱因星号等操作以外，现有的程序设计语言中为了提高正则表达式的效率，还支持回溯的操作。这同时也对正则表达式的处理技术提出了更高的要求。研究人员考虑并行化处理生成的有限自动机，称为标签化有限自动机("Tagged--Determined-Finite-Automata")，即"TDFA"，Aaron Karper\cite{karper2014efficient}在他2014年的硕士毕业论文里给出了一个基于TDFA的新匹配算法，将正则表达式的平均性能提升到了\(O\left( m\right) \)级别，并且给出了在Java程序设计语言中的实现。但是，在他的实现中，我们也可以看出经典的命令式程序设计语言的问题：代码极其冗长，达到了上千行。从软件工程的角度说，这无疑是对于软件可靠性极大的隐患之一。\\
-	\indent 和以C语言为代表的命令式程序设计语言相对的，还有以Lisp、 Ocaml、Haskell为代表的函数式程序设计语言。函数式程序设计语言强调数据之间的映射和变换。那么正则表达式的处理过程可以看作从输入代码到目标代码之间的映射。实际上，在Robert Harper的一个非正式的手稿中，他仅用了不到200行代码就实现了经典正则表达式的全部功能。在2010年的ICFP上， 来自德国基尔大学的Fischer等学者基于Haskell程序设计语言提出了函数式高效的正则匹配算法\cite{fischer2010play}。
+	\indent 和以C语言为代表的命令式程序设计语言相对的，还有以Lisp、 Ocaml、Haskell为代表的函数式程序设计语言。函数式程序设计语言强调数据之间的映射和变换。那么正则表达式的处理过程可以看作从输入代码到目标代码之间的映射。实际上，在Robert Harper的一个1999年的论文中\cite{harper1999proof}中实现的正则匹配算法仅了几十行代码，就实现了正则表达式的匹配功能。在2010年的ICFP上， 来自德国基尔大学的Fischer等学者基于Haskell程序设计语言也提出了高效的基于函数式编程的正则匹配算法\cite{fischer2010play}。时间复杂度为\(O\left( mlogn\right) \)
 
 
 \section{研究基本内容和意义}
-	本文着重考虑软件的高效性和正确性，本文基于2010年的ICFP中Fischer等人的文章，基于Standard ML语言实现一个正则表达式解析引擎，并尝试使用HOL4交互式定理证明器来对程序的正确性进行形式化验证。 Standard ML语言是经过小步语义规范定义的轻量级的函数式程序设计语言，并且在Linux和Windows平台上都有良好的运行支持。HOL4是基于Standard ML程序设计语言开发的、基于高阶逻辑的交互式定理证明器，可以用于证明程序的正确性。和各种各样由人操作保证软件工程的手段相比，由数理逻辑规律所保证的可靠性应当是最强的。
+	本文着重考虑软件的正确性，本文利用递归下降语法制导分析处理正则表达式，并基于Robert Harper 论文\cite{harper1999proof}中提出的匹配算法，使用Standard ML语言和SML/NJ编译器，实现一个正则表达式解析程序。
+	
+	传统的软件测试总是希望尽可能多地去覆盖软件运行的各种情况，从而发现其中的各种错误。而证明导向的程序调试是希望利用数学证明来保证程序的正确性，又由于函数式的程序和数学表达式比较接近，这样的话就能以比较高效和可靠的办法保证程序的正确性。
 
 \section{研究内容与论文结构}
 
 	\indent 第一章主要介绍课题的研究背景、研究现状和论文的整体内容和结构\\
-	\indent 第二章是论文中的基本概念，主要用递归定义的方法定义正则表达式，编译原理中词法分析、语法分析和抽象语法树的概念简介，Standard ML程序设计语言简介，以及HOL4定理证明器进行形式化验证的基础。\\
-	\indent 第三章将会从一个简单的递归下降语法分析程序开始，给出一个Standard ML正则库的简单实现，然后介绍Fischer论文中的算法\cite{fischer2010play}\\
-	\indent 第四章利用形式化的开发方法实现Fischer论文中的算法\\
-	\indent 第五章将会介绍基于形式化验证开发的正则库的测试结果。\\
-	\indent 第六章将会进行展望和总结。\\
-	\indent 第七章为附录，主要补全对本文展开思路没有影响的证明。
-
-\chapter{插入算法的示例}
-
-可用如下方式插入算法流程：
+	\indent 第二章是论文中的基本概念：主要包括：表达式简介和Standard ML程序设计语言基础，词法分析和语法分析简介。\\
+	\indent 第三章是基于函数式编程的需求分析和模块设计\\
+	\indent 第四章是词法分析程序和语法分析程序的实现\\
+	\indent 第六章是基于高阶函数的字符串和抽象语法树匹配的算法、证明和实现。\\
+	\indent 第七章是展望和反思。\\
+	\indent 第八章为附录，主要补全对本文展开思路没有影响的证明以及附上完整的程序  。
 
 
-\begin{breakablealgorithm}
-    \caption{ACP 调度器}
-    \label{algorithm: ACP}
-        \begin{algorithmic}[1]
-        \REQUIRE{要调度的作业集合$J$和资源集合$R$}
-        \FOR{each r $\in$ R}
-        %\STATE{test the c\_exec\_idx and the r\_exec\_idx of r with several benchmarking tools}
-        \STATE{使用基准测试工具对$r$进行测试}
-        \STATE{获取$r$的$storage_r$和$compute\_power_r$的值}
-        \STATE{将$storage_r$和$compute\_power_r$写入到资源限制中}
-        \ENDFOR
-        \WHILE{true}
-        \STATE{根据上次运行的结果，更新任务约束}
-        \FOR{each r $\in$ R}
-        \IF{r.schedular $\neq$ NULL}
-        \IF{r.runningtask $\neq$ NULL}
-        \STATE{rt $\leftarrow$ r.runningtask}
-        \STATE{st $\leftarrow$ rt.starttime}
-        \STATE{et $\leftarrow$ rt.endtime}
-        \STATE{pd $\leftarrow$ rt.performancedemand}
-        \STATE{sr $\leftarrow$ rt.scheduledresource}
-        \STATE{根据(rt, st, et, pd, sr)更新约束条件}
-        \STATE{$\slash\slash$ 根据任务的开始时间，结束时间，性能需求和其运行资源的性能添加一条约束}
-        \ELSE
-        \STATE{r.runningtask $\leftarrow$ NULL}
-        \STATE{$\slash\slash$ 将该任务设置为已完成}
-        \STATE{将 r.runningtask 从 r.schedular 中移除}
-        \STATE{pj $\leftarrow$ r.parentjob}
-        \IF{pj.schedular = NULL}
-        \STATE{从$J$中删除pj}
-        \ENDIF
-        \ENDIF
-        \ENDIF
-        \ENDFOR
-        \STATE{新建一个带有资源约束的模型}
-        \STATE{将任务约束加入到OPL模型中}
-        \STATE{将$J$和$R$作为约束添加到数据中}
-        \STATE{求解OPL模型}
-        \STATE{按照得出的最优解对任务进行分配}
-        \STATE{等待新的事件出现}
-        \ENDWHILE
-    \end{algorithmic}
-\end{breakablealgorithm}
 
 \chapter{基本概念和技术简介}
 \section{本章内容概述}
-	本章主要介绍论文中一些重要的基本概念。本章分为四节，第一节介绍正则表达式的定义。第二节介绍编译原理的部分基本概念。第三节介绍Standard ML程序设计语言。第四节为HOL4定理证明器简介。
-
+	本章主要介绍论文中一些重要的基本概念。本章分为四节，第一节介绍正则表达式的定义。第二节介绍Standard ML程序设计语言，第三节介绍词法分析的基本概念，第四节介绍递归下降语法制导分析的基本概念。
 \section{正则表达式}
 \subsection{正则表达式的递归定义}
 	本节主要参考Sipser\cite{Sips05a}计算理论导引中的内容，正则表达式作为和有限自动机相等价的模型，我们不妨从更直观的有限自动机出发来对正则表达式进行定义。考虑篇幅和不影响思路的原因，本节略去了证明，完整的证明放在第七章附录里。
@@ -206,11 +164,11 @@
 	
 	就像在算术中，我们可以对阿拉伯数字定义 \(+\) \(\times\) 这样的操作，组成 \( 2 \times \left( 3 +2\right) \)这样的算术表达式。在正则语言中，我们也可以对正则语言定义一些操作，我们可以称之为正则操作。
 	\begin{definition}
-		令 \(A\) 和 \(B\) 是两个正则语言， 我们定义并、连结和克莱因星号操作如下：\\
+		令 \(A\) 和 \(B\) 是两个正则语言， 我们定义并、连结和克莱因闭包操作如下：\\
 		\indent \indent 1.并： \(A \cup B = \left\lbrace x|x \in A \mbox{或} x \in B \right\rbrace \)\\
 		\indent \indent 2.连结: \(A \circ B = \left\lbrace xy| x \in A \mbox{且} y\in B \right\rbrace\)\\
 		\indent \indent 3.克莱因星号 \(A^* = \left\lbrace x_1 x_2 ...x_k | k \ge 0 \mbox{并且所有的} x_i \in  A \right\rbrace\)\\
-		\indent \indent 在优先级上，克莱因星号是最高级的，连结其次，并的优先级是最低的
+		\indent \indent 在优先级上，克莱因闭包是最高级的，连结其次，并的优先级是最低的
 	\end{definition}
 	我们可以证明下面的内容：
 	\begin{theorem}
@@ -237,56 +195,17 @@
 	\end{theorem}
 
 	
-\subsection{用上下文无关文法描述正则表达式}
-	基于定义3.5，我们可以使用上下文无关文法递归地描述正则表达式。但是在此之前，我们需要修改一下正则表达式约定的符号。由于计算机命令行程序难以处理"\(\left(\right)\)"，并且没有"\(\cup\)"符号和\(\circ\)，我们约定：\(\mbox{"}\left(\mbox{"和"}\right)\mbox{"}\)修改为\(\mbox{"}\left[  \mbox{"和"}\right]\mbox{"}\)。并且，我们用"\(+\)"代表"并"操作，即"\(\cup\)"，用"\(r_1 r_2\)"，也就是两个正则表达式直接连写来代表连结操作。
-	
-	现在，我们可以把定义3.5改写成如下的形式
-	\begin{equation}
-		r::= \quad \emptyset \quad| \quad\epsilon\quad |\quad a \quad  |\quad r_1 r_2\quad |\quad r_1 + r_2\quad | \quad r^*
-	\end{equation}
-	
-	我们首先从优先级最低的并操作开始，我们约定，上下文无关文法的起始符是rexp,那么，我们可以得到：
-	\begin{equation}
-		rexp \quad::=\quad rterm\quad  | \quad rterm + rexp
-	\end{equation}
-	\indent 起始符的推导有两种情况，如果有并操作的话，这种情况可以分解为两个子表达式，另外一种情况是直接推导出下一个子表达式。对于在并操作下的情况，为了避免在后面的递归下降分析出现左递归的情况， 我们规定 "$+$"符号左边是新的非终结符。如果后续的表达式中还会出现"$+$"操作符，那继续展开右边的 $rexp$ 即可。\\
-	\indent 对于优先级居中，而且也是双目操作的连结操作，我们可以像连结操作一样处理。这是因为：根据递归定义，我们可以把优先级更高、暂时不需要展开的正则表达式视作一个整体。在这种情况下，有更高等级的双目操作符可以抽象为同一个情况。在这种情况下，我们有：
-	\begin{equation}
-		rterm\quad::=\quad rfac\quad | \quad rfac\quad rterm
-	\end{equation}
-	\indent 对于优先级最高，而且是单目操作符的克莱因星号，用上下文无关文法描述是比较容易的：
-	\begin{equation}
-		rfac\quad::=\quad ratom \quad | \quad ratom^* 
-	\end{equation}
-	\indent 根据递归定义，最低级的非终结$ratom$对应两种情况，第一种情况是直接推导出非终结符，第二种情况是推导出括号下的作为一个整体的正则表达式。
-	\begin{equation}
-		ratom\quad::=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad]
-	\end{equation}
-	\indent 其中$@$对应的是空集， $!$ 对应的是空串， $a$对应的是字母表中任意一个字母， $\quad[\quad rexp \quad]$对应的是可能存在是括号内作为一个整体的正则表达式。 \\
-	\indent 综上所述，我们得到了正则表达式的上下文无关文法的定义：
-	\begin{equation}\label{cfg}
-		\begin{split}
-			rexp \quad::&=\quad rterm\quad  | \quad rterm + rexp \hfill  \\
-			rterm\quad::&=\quad rfac\quad | \quad rfac\quad rterm \hfill  \\
-			rfac\quad::&=\quad ratom \quad | \quad ratom^* \hfill \\
-			ratom\quad::&=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad] \hfill 
-		\end{split}
-	\end{equation}
-	\indent 从\(\left( 3-6\right) \)中我们不难看出，每一个非终结符都能推导出下一个非终结符，而最后一个非终结符$ratom$可以推导出终结符，这样的话，我们可以说\ref{cfg}中的上下文无关文法是可达的。
-	
+
 	
 
-\section{词法分析和语法分析简介}
-	这一节中主要对编译原理从词法分析到抽象语法树生成的过程和部分重要概念作简要的介绍。
-\section{词法分析简介}
-	词法分析
+
 \section{Standard ML 语言简介}
-	Standard ML语言最早是为了爱丁堡大学的可计算函数逻辑定理证明器而设计出来的。后来逐渐用于编译器设计、交互式验证等领域。而在这一节中，我们主要参考的是Standard ML语言规约文档\cite{harper1986standard}。是由卡耐基梅隆大学的Robert Harper等学者基于小步语义所制定出来的，这个文档严格地刻画了Standard ML语言的行为，后来Standard ML程序设计语言所有的编译器和运行环境的实现都是基于这个规约文档。 
+	Standard ML语言最早是为了爱丁堡大学的可计算函数逻辑定理证明器(LCF)而设计出来的。后来逐渐用于编译器设计、交互式验证等领域。而在这一节中，我们主要参考的是Standard ML语言规约文档\cite{harper1986standard}。是由卡耐基梅隆大学的Robert Harper等学者基于小步语义所制定出来的，这个文档严格地刻画了Standard ML语言的行为，后来Standard ML程序设计语言所有的编译器和运行环境的实现都是基于这个规约文档。 
 
 
 \subsection{Standard ML 语言的实现和运行环境}
 	Standard ML语言有两种运行模式，一种是由编译器直接编译产生可执行代码，另外一种运行模式是函数式程序设计语言所特有的“读入-计算-输出”循环(英语："Reading-Evaluating-Print" Loop)，也被称作为交互式顶层构件(英语："Interactive Toplevel")，是一个比较简单的，和程序的解释器、编译器进行交互的运行环境\cite{abelson1996structure}。\\
-	\indent Standard ML语言的实现有很多种，其中本论文主要涉及两个实现：第一个是SML/New Jersey，由美国的普林斯顿大学开发维护，被广泛应用于程序设计的课堂教学，以REPL环境为主，在本章中的所有代码都基于这个编译器；第二个则是Poly/ML编译器，这个编译器用于实现两个大型定理证明器项目———由慕尼黑工业大学和剑桥大学支持开发的Isabelle/HOL和剑桥大学和查尔姆斯理工学院支持的HOL4，这个编译器既支持REPL环境又可以编译出一个可执行文件，下一章的内容都是基于这个编译器运行的。
+	\indent Standard ML语言的实现有很多种，其中本论文主要涉及两个实现：第一个是SML/New Jersey，由美国的普林斯顿大学开发维护，被广泛应用于程序设计的课堂教学，以REPL环境为主，在本文的所有代码都可以在这个编译器下直接运行；第二个则是Poly/ML编译器，这个编译器用于实现两个大型定理证明器项目———由慕尼黑工业大学和剑桥大学支持开发的Isabelle/HOL和剑桥大学和查尔姆斯理工学院支持的HOL4，这个编译器既支持REPL环境又可以编译出一个可执行文件。
 \subsection{Standard ML语言中的类型}
 	Standard ML是静态强类型语言，也就是说每一个变量都必须有对应的类型，否则程序不可能通过编译器的类型检查，这就要求我们无论是在声明变量还是在编写函数的时候都要注意变量和参数的类型。下面为我们可以看几个在REPL环境中的例子。例如：
 	\begin{lstlisting}
@@ -320,16 +239,16 @@
 	上面这个声明了八个对象，数据类型\(regexp\)，和这个数据类型的七个构造子\(Empty\)、\(Char\)、\(AnyChar\)、\(Or\)、\(Concat\)和\(Star\)，以及每个构造子所对应的类型。例如，\(Or\)构造子必须由两个\(regex\)类型的元素作为参数去构造。每一个数据类型的变量包含且仅包含其构造子所构造的值。
 \subsection{Standard ML 语言函数式特性概览}
 	函数式程序设计中以数据的变换取代了状态，因而在函数式编程中程序没有数组、循环和赋值语句。相应的，作为支持函数式编程的语言，Standard ML有一系列的特性来解决问题。\\
-	\subsubsection{元组}
-	\indent 元组(\(tuple\)) 是Standard ML中最简单的数据结构，例如
+	\subsubsection*{元组}
+	\indent 元组(tuple) 是Standard ML中最简单的数据结构，例如
 	\begin{lstlisting}
 		(*两个int类型变量组成的元组*)
 		val pair : int * int = (2,3)
 	\end{lstlisting}
 	其中，元组的类型可以不同，元组中还可以嵌套元组。\\
 	\indent Standard ML只能支持函数返回一个参数，但是基于元组，我们可以让函数返回多个参数。
-	\subsubsection{表}
-	\indent 表(\(list\))。数据集可以组织成为下面的表这样的形式来处理。
+	\subsubsection*{表}
+	\indent 表(list)。数据集可以组织成为下面的表这样的形式来处理。
 	\begin{lstlisting}
 		[a,b,c,d,e]
 	\end{lstlisting}
@@ -338,9 +257,9 @@
 		val (op ::) : typ * typ list -> typ list		
 	\end{lstlisting}
 	其中， \(op\)的意思是这是一个函数。::操作符的意义是，给定一个表\(it\)，\(h::t\)会把这个表分为两个部分，表头第一个元素$h$和剩下的部分$t$。	
-	\indent 函数(\(function\)), Standard ML中的表达式主要由函数调用构成的。函数的参数可以是任何类型，包括函数本身。这部分特性在介绍CPS和高阶函数时会进行更详细的说明。Standard ML语言的垃圾收集功能\cite{paulson1996ml-5}支持了这个特性。\\
-	\subsubsection{模式匹配}
-	\indent 模式匹配(\(pattern\) \(matching\))，这是Standard ML语言中非常重要的一个特性，这个特性一般用于多个分支的时候，跳转到不同的分支情况，这个特性可以代替命令式程序语言中的\(case\)语句。模式匹配在Standard ML中有两种形式。\\
+	\indent 函数(function), Standard ML中的表达式主要由函数调用构成的。函数的参数可以是任何类型，包括函数本身。这部分特性在介绍CPS和高阶函数时会进行更详细的说明。Standard ML语言的垃圾收集功能\cite{paulson1996ml-5}支持了这个特性。\\
+	\subsubsection*{模式匹配}
+	\indent 模式匹配(pattern matching)，这是Standard ML语言中非常重要的一个特性，这个特性一般用于多个分支的时候，跳转到不同的分支情况，这个特性可以代替命令式程序语言中的case语句。模式匹配在Standard ML中有两种形式。\\
 	\indent 第一种形式被称作定义函数表达式，一般的形式如下：
 	\begin{lstlisting}
 		fun pat_1 => exp_1
@@ -370,8 +289,110 @@
 		exp.er
 	\end{lstlisting}
 	程序会首先计算\(exp\)的值，然后在\(case\)\(of\)语句下的各种情况进行匹配。
-	\subsubsection{高阶函数}
-	高阶函数($Higher$ $Order$ $Function$)。
+	\subsubsection*{高阶函数}
+	高阶函数(Higher Order Function)。高阶函数是函数式程序设计中重要的一种特性。函数本身也是可计算的值，也能作为参数传入另外一个函数。更直接地说，高阶函数是一种操作于另外一个或几个函数之上的函数，这里不妨举一个例子：对函数\(f\left(x_1,x_2...x_n \right) \)，当这个函数被另外一个函数\(g\)作用时，原来的\(f\)函数就变换为\(f\left[ g\left( x_1\right) ,g\left( x_2\right) ....g\left( x_n\right)\right]    \)。
+	\subsection{Standard ML中的访问控制}
+	众所周知现在流行的面向对象程序设计的三大特性为封装、继承和多态，其中封装这个特性主要是为了保证对程序中一些数据的访问控制。事实上，虽然Standard ML语言作为一个函数式语言不支持面向对象的特性，但是Standard ML也自有一套机制用来保证对程序中数据成员的访问控制。这就是模块(module)系统\cite{harper1989introduction}。
+	
+	
+	模块系统主要分为两个部分，签名(signature)和结构体(structure)。签名是对结构体的抽象和描述，主要规定了一个模块中的数据类型，以及外界可以访问的绑定数据和成员函数。结构体是对一个签名的具体实现，主要是对签名里声明的函数的实现。一个结构体也可以声明签名没有声明过的函数，这些函数外界都无法进行访问。和面向对象程序设计中的组合类似，签名中也可以声明其他结构体后使用结构体中可以访问的成员函数。 
+	
+	接下来简要介绍一下签名和结构体的语法。首先从签名开始，签名可以包括四个部分: 类型声明和数据类型声明、对异常的规定和值的声明，其中值的声明包括函数的声明和绑定值的声明，下面的代码便是一个例子：
+	\begin{lstlisting}
+		signature A =
+		 sig
+			...
+			datatype A = B |C |D
+			val x  : int = ;
+			val injection: int -> int ; 
+		    
+		 end
+	\end{lstlisting}
+	在签名中使用结构体的语法如下所示：
+	\begin{lstlisting}
+		sigature A =
+			sig 
+				...
+				structure B :B
+				...
+			end
+	\end{lstlisting}
+	对于一个结构体，首先，这个结构体必须声明它实现的是哪个签名；其次，它必须实现对应签名所声明的所有函数；此外，结构体也可以声明签名以外的变量和函数，但是这些变量和函数不能被外界所访问。下面看一个结构体的例子：
+	\begin{lstlisting}
+		structure M :> B = (* B 对应要实现的签名*)
+		struct
+			structure R = R (*使用的结构体*)
+			open R
+			...函数实现省略
+			
+		end
+	\end{lstlisting}	
+	
+	\section{词法分析简介}
+	词法分析是程序处理正则表达式的第一步，主要的任务是将读入的字符串组成词素，并生成一个词法单元序列，然后将这个词法单元序列交给语法分析程序进行分析。\cite{appel2004modern} 由于正则表达式本身比较简单， 这个词法分析程序仅需要完成两个任务：第一个任务是规定词素的类型，并将词素的类型和输入的字符产序列进行模式匹配；第二个任务是识别出非法输入字符。在后面的章节中，我们可以看到，利用Standard ML语言的模式匹配特性，我们可以非常简明地实现这个词法分析程序。
+	\section{递归下降语法制导分析简介}
+	
+	\subsection{上下文无关文法简介}
+	上下文无关文法是语法分析重要的数学工具。这一节对上下文无关文法的介绍主要参考了\cite{2002编译原理}和\cite{Sips05a}, 其中Sipser\cite{Sips05a}对上下文无关文法的理论进行了完备的论述，但是高度形式化，而Aho\cite{2002编译原理}则详细地介绍了上下文无关文法在编译原理中的应用。
+	
+	首先，我们看一下上下文无关文法的定义：
+	\begin{definition}[上下文无关文法]
+		一个上下文无关文法是一个四元组\(\left( V, \Sigma , R , S \right) \) ，其中
+		
+		1. \(V\) 是一个有限集，称作非终结符
+		
+		2. \(\Sigma\) 是一个和\(V\) 相异的有限集，称作非终结符。
+		
+		3. \(R\) 是一个规则的有限集，其中每一个规则把一个非终结符替换为一个由终结符和非终结符所组成的序列。
+		
+		4. \( S \in V\) 是起始符号
+		
+	\end{definition}
+	 其中，非终结符的层次结构可以用于正则表达式中不同操作符的优先级。而终结符应该是正则表达式中的操作符和普通字符。
+	 
+	 
+	 上下文无关文法和正则表达式一样，也是被我们用来描述语言，上下文无关文法得到一个语言具体的字符串的过程成为推导，定义如下：
+	 \begin{definition}[推导，最左推导]
+	 	
+	 \end{definition}
+	\subsection{用上下文无关文法描述正则表达式}
+	为了便于进行语法分析，我们
+	基于定义2.5，我们可以使用上下文无关文法递归地描述正则表达式。但是在此之前，我们需要修改一下正则表达式约定的符号。由于计算机命令行程序难以处理"\(\left(\right)\)"，并且没有"\(\cup\)"符号和\(\circ\)，我们约定：\(\mbox{"}\left(\mbox{"和"}\right)\mbox{"}\)修改为\(\mbox{"}\left[  \mbox{"和"}\right]\mbox{"}\)。并且，我们用"\(+\)"代表"并"操作，即"\(\cup\)"，用"\(r_1 r_2\)"，也就是两个正则表达式直接连写来代表连结操作。
+	
+	现在，我们可以把定义3.5改写成如下的形式
+	\begin{equation}
+		r::= \quad \emptyset \quad| \quad\epsilon\quad |\quad a \quad  |\quad r_1 r_2\quad |\quad r_1 + r_2\quad | \quad r^*
+	\end{equation}
+	
+	我们首先从优先级最低的并操作开始，我们约定，上下文无关文法的起始符是rexp,那么，我们可以得到：
+	\begin{equation}
+		rexp \quad::=\quad rterm\quad  | \quad rterm + rexp
+	\end{equation}
+	\indent 起始符的推导有两种情况，如果有并操作的话，这种情况可以分解为两个子表达式，另外一种情况是直接推导出下一个子表达式。对于在并操作下的情况，为了避免在后面的递归下降分析出现左递归的情况， 我们规定 "$+$"符号左边是新的非终结符。如果后续的表达式中还会出现"$+$"操作符，那继续展开右边的 $rexp$ 即可。\\
+	\indent 对于优先级居中，而且也是双目操作的连结操作，我们可以像连结操作一样处理。这是因为：根据递归定义，我们可以把优先级更高、暂时不需要展开的正则表达式视作一个整体。在这种情况下，有更高等级的双目操作符可以抽象为同一个情况。在这种情况下，我们有：
+	\begin{equation}
+		rterm\quad::=\quad rfac\quad | \quad rfac\quad rterm
+	\end{equation}
+	\indent 对于优先级最高，而且是单目操作符的克莱因闭包，用上下文无关文法描述是比较容易的：
+	\begin{equation}
+		rfac\quad::=\quad ratom \quad | \quad ratom^* 
+	\end{equation}
+	\indent 根据递归定义，最低级的非终结$ratom$对应两种情况，第一种情况是直接推导出非终结符，第二种情况是推导出括号下的作为一个整体的正则表达式。
+	\begin{equation}
+		ratom\quad::=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad]
+	\end{equation}
+	\indent 其中$@$对应的是空集， $!$ 对应的是空串， $a$对应的是字母表中任意一个字母， $\quad[\quad rexp \quad]$对应的是可能存在是括号内作为一个整体的正则表达式。 \\
+	\indent 综上所述，我们得到了正则表达式的上下文无关文法的定义：
+	\begin{equation}\label{cfg}
+		\begin{split}
+			rexp \quad::&=\quad rterm\quad  | \quad rterm + rexp \hfill  \\
+			rterm\quad::&=\quad rfac\quad | \quad rfac\quad rterm \hfill  \\
+			rfac\quad::&=\quad ratom \quad | \quad ratom^* \hfill \\
+			ratom\quad::&=\quad @ \quad | \quad ! \quad |\quad a \quad | \quad[\quad rexp \quad] \hfill 
+		\end{split}
+	\end{equation}
+	\indent 从\(\left( 3-6\right) \)中我们不难看出，每一个非终结符都能推导出下一个非终结符，而最后一个非终结符$ratom$可以推导出终结符，这样的话，我们可以说\ref{cfg}中的上下文无关文法是可达的。
+	
 	
 %最后设置格式，插入参考文献。
 \defaultfont
@@ -385,10 +406,6 @@
 \addcontentsline{toc}{chapter}{致谢}
 \thispagestyle{empty}
 本科生涯看似漫长却又一晃而过，回首走过的岁月，我感慨良多。从最初的论文选题、思路梳理到研讨交流、反复修改直至最终完稿，都离不开老师、同学和亲人们的支持和无私帮助，在此我要向他们表达我最诚挚的谢意。
-
-
-...
-
 求学生涯暂告段落，但求知之路却永无止境。我将倍加珍惜大学生活给予我的珍贵财富，不忘初心，砥砺前行！
 \chapter*{本科期间发表论文和科研情况}
 \addcontentsline{toc}{chapter}{本科期间发表论文和科研情况}
